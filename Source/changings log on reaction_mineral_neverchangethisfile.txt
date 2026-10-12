@@ -1,0 +1,25 @@
+commment Line 142
+add Line 143:  tstrxn%rate = -999.d0
+
+Change Line 234 and Line 235 : UNINITIALIZED_DOUBLE to -999.d0
+                              prefactor%rate = -999.d0
+                              prefactor%activation_energy = -999.d0
+
+Comment Line 356 Line 359, and Line 367; and add new lines
+
+!if (Uninitialized(cur_prefactor%rate)) then
+if (dabs(cur_prefactor%rate - (-999.d0)) < 1.d-40) then
+!if (Uninitialized(cur_prefactor%rate)) then
+if (dabs(cur_prefactor%rate - (-999.d0)) < 1.d-40) then
+!if (Uninitialized(cur_prefactor%activation_energy)) then
+if (dabs(cur_prefactor%activation_energy - (-999.d0)) < 1.d-40) then
+
+Comment Line 737 and Line 881
+
+ line 736 ! Zero all rates as default 
+ line 737 !rt_auxvar%mnrl_rate(:) = 0.d0
+
+
+ line 879 ! store volumetric rate to be used in updating mineral volume fractions
+ line 880 ! at end of time step
+ line 881 !rt_auxvar%mnrl_rate(imnrl) = Im ! mol/sec/m^3 bulk

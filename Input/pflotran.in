@@ -1,0 +1,527 @@
+SIMULATION
+  SIMULATION_TYPE SUBSURFACE
+  PROCESS_MODELS
+    SUBSURFACE_FLOW flow
+      MODE RICHARDS
+       OPTIONS
+      /
+    /
+    SUBSURFACE_TRANSPORT transport 
+      MODE GIRT
+      OPTIONS
+        USE_MILLINGTON_QUIRK_TORTUOSITY
+      /
+    /
+  /
+
+  RESTART
+      FILENAME pflotran-restart1.h5
+      RESET_TO_TIME_ZERO
+  /
+skip
+
+RESET_TO_TIME_ZERO
+noskip
+
+  CHECKPOINT
+      FORMAT HDF5
+      TIMES yr 160. 90. 120. 110. 140. 25. 50. 390. 40. 690. 790. 990. 
+  /
+
+END
+
+
+SUBSURFACE
+
+
+NUMERICAL_METHODS TRANSPORT
+ TIMESTEPPER
+    TIMESTEP_REDUCTION_FACTOR 0.65d0
+    TIMESTEP_MAXIMUM_GROWTH_FACTOR 2.d0
+  /
+  NEWTON_SOLVER
+
+
+    ITOL 1.d-8
+  /
+  LINEAR_SOLVER
+    SOLVER ITERATIVE
+  /
+END
+
+
+NUMERICAL_METHODS flow
+ TIMESTEPPER
+    TIMESTEP_REDUCTION_FACTOR 0.65d0
+    TIMESTEP_MAXIMUM_GROWTH_FACTOR 2.d0
+  /
+  NEWTON_SOLVER
+    ITOL 1.d-6
+  /
+
+END
+
+REFERENCE_LIQUID_DENSITY 1000.d0
+#=========================== chemistry ========================================
+CHEMISTRY
+  PRIMARY_SPECIES
+    Fe+++ 
+    Fe++ 
+    SO4-- 
+    H+ 
+    DOxygen 
+  /
+  SECONDARY_SPECIES 
+    FeOH++    
+    FeOH+    
+    Fe(OH)2+ 
+  / 
+  PASSIVE_GAS_SPECIES
+
+    O2
+  /  
+  ACTIVE_GAS_SPECIES
+    GAS_TRANSPORT_IS_UNVETTED
+    O2
+  / 
+  MINERALS 
+    Pyrite_zhong 
+    Ferrihydrite 
+  / 
+  MINERAL_KINETICS 
+    Pyrite_zhong 
+      RATE_CONSTANT 0.0 mol/m^2-sec 
+    / 
+    Ferrihydrite 
+      RATE_CONSTANT 0.0 mol/m^2-sec 
+    / 
+  / 
+  REACTION_SANDBOX
+    EXAMPLE
+  /
+  /
+  DATABASE ./hanford3.dat
+  LOG_FORMULATION
+  ACTIVITY_COEFFICIENTS OFF
+
+  OUTPUT
+    SECONDARY_SPECIES
+    all
+    TOTAL
+    
+  /
+END
+
+
+#=========================== discretization ===================================
+GRID
+TYPE structured
+ORIGIN 0.d0 0.d0 0.d0
+NXYZ 2020 1 1000
+DXYZ
+0.5d0
+1.d0
+0.4d0
+/
+END
+
+
+#=========================== fluid properties 1.d-13 ================================= 
+FLUID_PROPERTY
+  PHASE LIQUID
+  DIFFUSION_COEFFICIENT 2.d-9
+END
+FLUID_PROPERTY
+  PHASE GAS
+  DIFFUSION_COEFFICIENT 2.d-5
+END
+
+#=========================== material properties ==============================
+
+
+MATERIAL_PROPERTY soil11   !layer 4
+  ID 1
+  POROSITY 0.06
+  CHARACTERISTIC_CURVES cc2
+  #LONGITUDINAL_DISPERSIVITY 0.0001
+  PERMEABILITY
+      PERM_ISO 5.d-15
+  /
+END
+
+MATERIAL_PROPERTY soil2    !layer 3
+  ID 2
+  POROSITY 0.065
+  CHARACTERISTIC_CURVES cc2
+  #LONGITUDINAL_DISPERSIVITY 0.0001
+  PERMEABILITY
+      PERM_ISO 2.d-14   !7.d-14
+  /
+END
+
+MATERIAL_PROPERTY soil3    !layer 1
+  ID 3
+  POROSITY 0.065
+  CHARACTERISTIC_CURVES cc2
+  #LONGITUDINAL_DISPERSIVITY 0.0001
+  PERMEABILITY
+      PERM_ISO 2.d-13  ! 6.d-13
+  /
+END
+
+MATERIAL_PROPERTY soil14   !layer 4
+  ID 4
+  POROSITY 0.06
+  CHARACTERISTIC_CURVES cc2
+  #LONGITUDINAL_DISPERSIVITY 0.0001
+  PERMEABILITY
+      PERM_ISO 5.d-15
+  /
+END
+
+MATERIAL_PROPERTY soil15
+  ID 5
+  POROSITY 0.065
+  CHARACTERISTIC_CURVES cc2
+  #LONGITUDINAL_DISPERSIVITY 0.0001
+  PERMEABILITY
+      PERM_ISO 2.d-11
+  /
+END
+
+MATERIAL_PROPERTY soil16    !layer 2
+  ID 6
+  POROSITY 0.065
+  CHARACTERISTIC_CURVES cc2
+  #LONGITUDINAL_DISPERSIVITY 0.0001
+  PERMEABILITY
+      PERM_ISO 7.d-14
+  /
+END
+
+MATERIAL_PROPERTY soil17
+  ID 7
+  POROSITY 0.065
+  CHARACTERISTIC_CURVES cc2
+  #LONGITUDINAL_DISPERSIVITY 0.0001
+  PERMEABILITY
+      PERM_ISO 1.d-11
+  /
+END
+
+#=========================== saturation functions =============================
+
+CHARACTERISTIC_CURVES cc2
+  SATURATION_FUNCTION VAN_GENUCHTEN
+    ALPHA  1.058d-3
+    M 3.8699d-01
+    LIQUID_RESIDUAL_SATURATION 5.0000d-02
+  /  
+  PERMEABILITY_FUNCTION MUALEM_VG_LIQ 
+    M 3.8699d-01
+    LIQUID_RESIDUAL_SATURATION 5.0000d-02
+  /
+END
+
+#=========================== output options ===================================
+
+OUTPUT
+TIME_UNITS yr
+SNAPSHOT_FILE
+#FORMAT TECPLOT POINT
+FORMAT HDF5 MULTIPLE_FILES TIMES_PER_FILE 2000
+    NO_PRINT_INITIAL
+    PERIODIC TIME  20. yr
+VELOCITY_AT_CENTER
+/
+OBSERVATION_FILE
+PERIODIC TIME  50. yr
+/
+/
+
+#=========================== times ============================================
+TIME 
+
+  FINAL_TIME 200.0 yr 
+  INITIAL_TIMESTEP_SIZE 1.d-8 yr 
+  MAXIMUM_TIMESTEP_SIZE 0.001 yr at 0. yr 
+  MAXIMUM_TIMESTEP_SIZE 0.01 yr at 1. yr 
+  MAXIMUM_TIMESTEP_SIZE 0.01 yr at 10. yr 
+  MAXIMUM_TIMESTEP_SIZE 0.1 yr  at 20. yr 
+
+/ 
+
+#=========================== regions ==========================================
+REGION all
+COORDINATES
+0.d0 0.d0 0.d0
+1010.d0 1.d0 400.d0
+/
+END
+
+
+REGION upper
+COORDINATES
+0.d0 0.d0 120.d0
+1010.d0 1.d0 400.d0
+/
+END
+
+
+REGION lower
+COORDINATES
+0.d0 0.d0 0.d0
+1010.d0 1.d0 120.d0
+/
+END
+
+
+
+REGION top
+  FILE ./2020x1x1000x22.h5
+END
+
+REGION OXI
+  FILE ./2020x1x1000x22.h5
+END
+
+REGION UNOXI
+  FILE ./2020x1x1000x22.h5
+END
+
+REGION bottom
+FACE BOTTOM
+COORDINATES
+0.d0 0.d0 0.d0
+1020.d0 1.d0 0.d0
+/
+END
+
+
+REGION west
+FACE WEST
+COORDINATES
+0.d0 0.d0 0.d0
+0.d0 1.d0 400.d0
+/
+END
+
+
+
+
+REGION east1
+FACE EAST
+COORDINATES
+1000.d0 0.d0 100.d0
+1000.d0 1.d0 150.d0
+/
+END
+
+REGION river
+FACE TOP
+COORDINATES
+1000.d0 0.d0 120.d0
+1010.d0 1.d0 120.d0
+/
+END
+
+
+REGION ob2
+COORDINATE 500.d0 0.d0 100.d0
+/
+
+OBSERVATION
+REGION ob2
+VELOCITY
+/
+
+
+#=========================== constraints ======================================
+CONSTRAINT initial1
+  CONCENTRATIONS
+    Fe+++  1.d-8 T mol/L 
+    Fe++   1.d-7 T mol/L 
+    SO4--  2.d-7 T mol/L 
+    H+     1.d-6 T mol/L 
+    DOxygen 0.21 G O2 
+  /
+
+  MINERALS
+#-999 is defined in changed reaction_mineral.F90
+    Pyrite_zhong 0.002 -999 m^2/m^3
+    Ferrihydrite 0.00001 -999 m^2/m^3
+  /
+
+END
+
+CONSTRAINT initial2
+  CONCENTRATIONS
+    Fe+++  1.d-8 T mol/L 
+    Fe++   1.d-7 T mol/L 
+    SO4--  2.d-7 T mol/L 
+    H+     1.d-6 T mol/L 
+    DOxygen 0.21 G O2 
+  /
+
+  MINERALS
+#-999 is defined in changed reaction_mineral.F90
+    Pyrite_zhong 0.06 -999 m^2/m^3
+    Ferrihydrite 0.00001 -999 m^2/m^3
+  /
+
+END
+
+CONSTRAINT inlet
+  CONCENTRATIONS
+    Fe+++  1.d-8 T mol/L 
+    Fe++   1.d-7 T mol/L 
+    SO4--  2.d-7 T mol/L 
+    H+     1.d-6 T mol/L 
+    DOxygen 0.21 G O2 
+  /
+END
+
+CONSTRAINT outlet
+  CONCENTRATIONS
+    Fe+++  1.d-14 T mol/L 
+    Fe++   1.d-14 T mol/L 
+    SO4--  2.d-14 T mol/L 
+    H+     1.d-14 T mol/L 
+    DOxygen 0.00021 G O2 
+  /
+END
+
+
+
+#=========================== flow conditions ==================================
+
+
+FLOW_CONDITION initial
+TYPE
+PRESSURE HYDROSTATIC
+  /
+  DATUM 0.d0 0.d0 120.d0 
+  GRADIENT
+    PRESSURE 0.d0 0.d0 0.d0
+  /
+
+PRESSURE 101325.d0
+END
+
+
+
+FLOW_CONDITION east1 
+TYPE
+PRESSURE DIRICHLET_SEEPAGE
+  /
+    DATUM 1000.d0 0.d0 120.d0
+  GRADIENT
+    PRESSURE 0.d0 0.d0 0.d0
+  /
+PRESSURE 101325.d0
+END
+
+
+FLOW_CONDITION river
+TYPE
+PRESSURE DIRICHLET_SEEPAGE
+  /
+      DATUM 1000.d0 0.d0 120.d0
+  GRADIENT
+    PRESSURE 0.d0 0.d0 0.d0
+  /
+PRESSURE 101325.d0
+END
+
+FLOW_CONDITION top
+TYPE
+PRESSURE DIRICHLET_SEEPAGE
+FLUX NEUMANN
+/
+PRESSURE 101325.d0
+FLUX LIST
+  TIME_UNITS yr
+  DATA_UNITS m/yr	
+     0.    0.5
+/
+END
+
+
+### rate = 0.2; 0.5 ; 0.4; 0.3;   
+
+
+#=========================== transport conditions =============================
+TRANSPORT_CONDITION initial1
+  TYPE ZERO_GRADIENT
+  TIME_UNITS yr
+  CONSTRAINT_LIST
+  0.d0   initial1
+  /
+END
+
+TRANSPORT_CONDITION initial2
+  TYPE ZERO_GRADIENT
+  TIME_UNITS yr
+  CONSTRAINT_LIST
+    0.d0  initial2
+  /
+END
+
+
+TRANSPORT_CONDITION inlet
+  TYPE DIRICHLET_ZERO_GRADIENT
+  TIME_UNITS yr
+  CONSTRAINT_LIST
+    0.d0  inlet
+  /
+END
+
+TRANSPORT_CONDITION outlet
+  TYPE DIRICHLET_ZERO_GRADIENT
+  TIME_UNITS yr
+  CONSTRAINT_LIST
+    0.d0 outlet
+  /
+END
+
+
+#=========================== condition couplers ===============================
+
+# initial condition for oxidized zone
+INITIAL_CONDITION
+TRANSPORT_CONDITION initial1
+FLOW_CONDITION initial
+REGION OXI
+END
+
+# initial condition for unoxidized zone
+INITIAL_CONDITION
+TRANSPORT_CONDITION initial2
+FLOW_CONDITION initial
+REGION UNOXI
+END
+
+
+
+
+BOUNDARY_CONDITION
+TRANSPORT_CONDITION outlet
+FLOW_CONDITION river
+REGION river
+END
+
+# top boundary condition
+BOUNDARY_CONDITION
+TRANSPORT_CONDITION inlet
+FLOW_CONDITION top
+REGION top
+END
+
+
+#=========================== stratigraphy couplers ============================
+STRATA
+  FILE ./2020x1x1000x22.h5
+END
+
+
+END_SUBSURFACE  
