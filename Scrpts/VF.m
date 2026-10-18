@@ -53,11 +53,11 @@ caxis([0.002, 0.06]);
 colorbar;
  OXI=[];
  UNOXI=[];
-%  for i = 1:length(vf)
-%      if vf(i)<=0.0522
-%          OXI=[OXI;i];
-%      else 
-%          UNOXI=[UNOXI;i];
-%      end
-%  end
+  for i = 1:length(vf)
+      if vf(i)<=0.0522
+          OXI=[OXI;i];
+      else 
+          UNOXI=[UNOXI;i];
+      end
+  end
     
