@@ -38,7 +38,7 @@ for m = 0:515
 end
 WF=[wf1;wf2;wf3];
 
- for i=0:6
+ for i=2
     % for i = 1: length(t)
     %     time=string(t(i));
     time= string(i);
@@ -49,7 +49,7 @@ WF=[wf1;wf2;wf3];
     pre=[];
     Fe2=[];
     Fe3=[];
-name='conc55555_';
+name='conc_base_rate';
 back='.csv';
 file=append(name,time,back);
 M = readmatrix(file);
