@@ -54,7 +54,7 @@ colorbar;
  OXI=[];
  UNOXI=[];
   for i = 1:length(vf)
-      if vf(i)<=0.0522
+      if vf(i)<=0.036
           OXI=[OXI;i];
       else 
           UNOXI=[UNOXI;i];
